@@ -27,11 +27,3 @@ test {
     useJUnitPlatform()
 }
 
-task buildFrontend(type: PnpmTask) {
-    args = ['build']
-}
-
-build {
-    // build frontend before build
-    tasks.getByName('compileJava').dependsOn('buildFrontend')
-}
