@@ -1,7 +1,6 @@
 package run.halo.twikoo;
 
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
@@ -11,18 +10,13 @@ import reactor.core.publisher.Mono;
 import run.halo.app.plugin.SettingFetcher;
 import run.halo.app.theme.dialect.TemplateHeadProcessor;
 
-/**
- * prismjs 插件
- *
- * @author liuzhihang
- * @date 2022/10/23
- */
+
 @Component
-public class DefaultTwikoo implements TemplateHeadProcessor {
+public class TwikooJSHeadProcessor implements TemplateHeadProcessor {
 
     private final SettingFetcher settingFetcher;
 
-    public DefaultTwikoo(SettingFetcher settingFetcher) {
+    public TwikooJSHeadProcessor(SettingFetcher settingFetcher) {
         this.settingFetcher = settingFetcher;
     }
 
@@ -64,47 +58,40 @@ public class DefaultTwikoo implements TemplateHeadProcessor {
                                       }
                                   }, null))
                               }
-                      
-                              const getCount = () => {
-                                  twikoo.getCommentsCount({
-                                      envId: "%s",
-                                      region: '',
-                                      urls: [window.location.pathname],
-                                      includeReply: true
-                                  }).then(function (res) {
-                                      document.getElementById('twikoo-count').innerText = res[0].count
-                                  }).catch(function (err) {
-                                  });
-                              }
-                      
-                              const runFn = () => {
-                                  init()
-                                  true && getCount()
-                              }
-                      
+                              const loadComment = (dom, callback) => {
+                                      if ('IntersectionObserver' in window) {
+                                          const observerItem = new IntersectionObserver((entries) => {
+                                              if (entries[0].isIntersecting) {
+                                                  callback()
+                                                  observerItem.disconnect()
+                                              }
+                                          }, {threshold: [0]})
+                                          observerItem.observe(dom)
+                                      } else {
+                                          callback()
+                                      }
+                              },
                               const loadTwikoo = () => {
                                   if (typeof twikoo === 'object') {
-                                      setTimeout(runFn, 0)
+                                      setTimeout(init, 0)
                                       return
                                   }
-                                  getScript("/plugins/PluginTwikoo/assets/static/twikoo.all.min.js").then(runFn)
+                                  getScript("/plugins/PluginTwikoo/assets/static/twikoo.all.min.js").then(init)
                               }
                       
                               if ('Twikoo' === 'Twikoo' || !false) {
-                                  if (false) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+                                  if (false) loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
                                   else loadTwikoo()
                               } else {
                                   window.loadOtherComment = () => {
                                       loadTwikoo()
                                   }
                               }
-                      
-                      
                           })()
                 </script>
                                 
                 <!-- twikoo end -->
-                """.formatted(config.getEnvId(),config.getEnvId());
+                """.formatted(config.getEnvId());
     }
 
     @Data

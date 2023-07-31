@@ -4,7 +4,7 @@ metadata:
   name: plugin-twikoo-settings
 spec:
   forms:
-    - group: base
+    - group: basic
       label: 基本设置
       formSchema:
         - $formkit: url
