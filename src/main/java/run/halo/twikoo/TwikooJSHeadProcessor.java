@@ -70,7 +70,7 @@ public class TwikooJSHeadProcessor implements TemplateHeadProcessor {
                                       } else {
                                           callback()
                                       }
-                              },
+                              }
                               const loadTwikoo = () => {
                                   if (typeof twikoo === 'object') {
                                       setTimeout(init, 0)
