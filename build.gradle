@@ -5,7 +5,7 @@ plugins {
     id "run.halo.plugin.devtools" version "0.0.4"
 }
 
-group 'run.halo.starter'
+group 'run.halo.twikoo'
 sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -25,10 +25,6 @@ dependencies {
 
 test {
     useJUnitPlatform()
-}
-
-node {
-    nodeProjectDir = file("${project.projectDir}/console")
 }
 
 task buildFrontend(type: PnpmTask) {

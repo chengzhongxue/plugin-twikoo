@@ -1,0 +1,14 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: plugin-twikoo-settings
+spec:
+  forms:
+    - group: base
+      label: 基本设置
+      formSchema:
+        - $formkit: url
+          label: 环境id/后端URL
+          name: envId
+          validation: 请输入环境id或URL
+          help: 详情请查看文档 https://twikoo.js.org/
