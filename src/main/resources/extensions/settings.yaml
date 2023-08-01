@@ -10,5 +10,30 @@ spec:
         - $formkit: url
           label: 环境id/后端URL
           name: envId
-          validation: 请输入环境id或URL
+          placeholder: 请输入环境id或URL
+          validation: required
           help: 详情请查看文档 https://twikoo.js.org/
+        - $formkit: text
+          label: 容器元素
+          name: el
+          value: "#twikoo-wrap"
+          validation: required
+          placeholder: 请输入容器元素
+        - $formkit: textarea
+          label: 评论加载成功后的回调函数
+          name: onCommentLoaded
+          help: 发表评论后自动刷新评论时、加载下一页评论时，也会触发。评论加载失败时不会触发。
+        - $formkit: url
+          label: 自定义 js
+          name: js
+          help: 默认是最新版的js
+        - $formkit: radio
+          label: 开启PJAX
+          value: true
+          name: isPjax
+          help: 主题是否使用pjax,未使用不用开启
+          options:
+            - value: true
+              label: 开启
+            - value: false
+              label: 关闭

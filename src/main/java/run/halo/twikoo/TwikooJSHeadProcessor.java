@@ -1,6 +1,7 @@
 package run.halo.twikoo;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
@@ -31,30 +32,28 @@ public class TwikooJSHeadProcessor implements TemplateHeadProcessor {
     }
 
     private String twikooJsScript(BasicConfig config) {
-        // language=html
-        return """
-                <!-- twikoo start -->
-                <script>
-                   (() => {
+        String script = "";
+
+        if (config.getIsPjax()){
+            script = script + """
+                     <script data-pjax> 
+                     (() => {
+                    """;
+        }else {
+            script = script + """
+                     <script>
+                     (() => {
+                    """;
+        }
+
+        script = script + """
                               const init = () => {
                                   twikoo.init(Object.assign({
-                                      el: '#twikoo-wrap',
+                                      el: '%s',
                                       envId: "%s",
                                       region: '',
                                       onCommentLoaded: function () {
-         
-                                          $("input").focus(function () {
-                                              heo_intype = true;
-                                          });
-                                          $("textarea").focus(function () {
-                                              heo_intype = true;
-                                          });
-                                          $("input").focusout(function () {
-                                              heo_intype = false;
-                                          });
-                                          $("textarea").focusout(function () {
-                                              heo_intype = false;
-                                          });
+                                           %s
                                       }
                                   }, null))
                               }
@@ -70,32 +69,62 @@ public class TwikooJSHeadProcessor implements TemplateHeadProcessor {
                                       } else {
                                           callback()
                                       }
-                              }
-                              const loadTwikoo = () => {
-                                  if (typeof twikoo === 'object') {
-                                      setTimeout(init, 0)
-                                      return
-                                  }
-                                  getScript("/plugins/PluginTwikoo/assets/static/twikoo.all.min.js").then(init)
-                              }
-                      
+                              }                 
+                """.formatted(config.getEl(),config.getEnvId(),config.getOnCommentLoaded());
+
+
+        if (StringUtils.isNotBlank(config.getJs())) {
+            // language=html
+            script = script + """
+                     const loadTwikoo = () => {
+                           if (typeof twikoo === 'object') {
+                                 setTimeout(init, 0)
+                               return
+                           }
+                           getScript("%s").then(init)
+                     }
+                    """.formatted(config.getJs());
+        }else {
+            script = script + """
+                     const loadTwikoo = () => {
+                           if (typeof twikoo === 'object') {
+                                 setTimeout(init, 0)
+                               return
+                           }
+                           getScript("/plugins/PluginTwikoo/assets/static/twikoo.all.min.js").then(init)
+                     }
+                    """;
+        }
+            // language=html
+        script = script + """
+                
                               if ('Twikoo' === 'Twikoo' || !false) {
-                                  if (false) loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+                                  if (false) loadComment(document.getElementById('%s'), loadTwikoo)
                                   else loadTwikoo()
                               } else {
                                   window.loadOtherComment = () => {
                                       loadTwikoo()
                                   }
                               }
-                          })()
+                             
+                """.formatted(config.getEl());
+
+        script = script + """  
+            })()
                 </script>
-                                
-                <!-- twikoo end -->
-                """.formatted(config.getEnvId());
+            """;
+
+        return script;
     }
 
     @Data
     public static class BasicConfig {
         String envId;
+        String el;
+        String onCommentLoaded;
+        String js;
+        Boolean isPjax;
+
+
     }
 }
